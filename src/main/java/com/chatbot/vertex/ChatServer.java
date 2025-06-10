@@ -73,7 +73,7 @@ public class ChatServer {
         Dotenv dotenv = Dotenv.load();
         String projectId = dotenv.get("PROJECT_ID");
         String location = dotenv.get("LOCATION");
-        String modelName = "gemini-2.0-flash-lite-001";
+        String modelName = "gemini-2.0-flash-001";
         GenerationConfig config = GenerationConfig.newBuilder().setMaxOutputTokens(1024).build();
         VertexAI vertexAI = new VertexAI(projectId, location);
         model = new GenerativeModel.Builder()

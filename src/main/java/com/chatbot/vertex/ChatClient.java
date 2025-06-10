@@ -21,9 +21,8 @@ public class ChatClient {
      * Starts the interactive command-line session to chat with the server.
      */
     public void runConsoleSession() {
-        System.out.println("==============================================");
         System.out.println("Chat client started. Type 'exit' to quit.");
-        System.out.println("==============================================");
+       
 
         try (BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in))) {
             String userInput;
