@@ -7,15 +7,22 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-public class ChatApiClient {
+public class ChatClient {
 
-    private static final String SERVER_URL = "http://localhost:7070/chat";
+    private final String serverUrl;
+    private final HttpClient httpClient;
 
-    public static void main(String[] args) {
-        // Create an HttpClient instance
-        HttpClient client = HttpClient.newHttpClient();
-        
-        System.out.println("Connected to ChatBot API. Type 'exit' to quit.");
+    public ChatClient(String serverUrl) {
+        this.serverUrl = serverUrl;
+        this.httpClient = HttpClient.newHttpClient();
+    }
+
+    /**
+     * Starts the interactive command-line session to chat with the server.
+     */
+    public void runConsoleSession() {
+        System.out.println("==============================================");
+        System.out.println("Chat client started. Type 'exit' to quit.");
         System.out.println("==============================================");
 
         try (BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in))) {
@@ -28,24 +35,16 @@ public class ChatApiClient {
                     break;
                 }
 
-                // Create an HTTP POST request
                 HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(SERVER_URL))
-                        .header("Content-Type", "text/plain")
+                        .uri(URI.create(serverUrl))
                         .POST(HttpRequest.BodyPublishers.ofString(userInput))
                         .build();
 
-                // Send the request and get the response
-                // The response body is handled as a String
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-                // Print the chatbot's response
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
                 System.out.println("Chatbot: " + response.body());
             }
         } catch (Exception e) {
-            System.err.println("An error occurred. Is the ChatApiServer running?");
-            e.printStackTrace();
+            System.err.println("An error occurred. Is the server running? Details: " + e.getMessage());
         }
-        System.out.println("Disconnected.");
     }
 }
