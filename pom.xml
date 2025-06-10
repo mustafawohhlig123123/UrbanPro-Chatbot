@@ -1,0 +1,63 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.chatbot.vertex</groupId>
+    <artifactId>vertex-chatbot</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <!-- Use a modern Java version -->
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <!-- 1. Define the Google Cloud BOM (Bill of Materials) -->
+    <!-- This manages the versions of all Google Cloud libraries to ensure they are compatible. -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>libraries-bom</artifactId>
+                <version>26.40.0</version> <!-- Use a recent BOM version -->
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- 2. List your dependencies WITHOUT versions -->
+    <!-- The versions are now handled by the BOM -->
+    <dependencies>
+        <!-- The only dependency you need for your code. -->
+        <!-- It brings in aiplatform, auth, and other required libraries automatically. -->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-vertexai</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>io.github.cdimascio</groupId>
+          <artifactId>dotenv-java</artifactId>
+          <version>3.0.0</version>
+        </dependency>
+
+    </dependencies>
+
+    <!-- 3. Correct the build plugin -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.2.0</version> <!-- Use a recent plugin version -->
+                <configuration>
+                    <!-- This MUST match your package and class name -->
+                    <mainClass>com.chatbot.vertex.App</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

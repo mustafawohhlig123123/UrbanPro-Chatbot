@@ -1,0 +1,49 @@
+bulker.xlsx
+
+proj-newsshield-prod-infra-55daa0677b9d (1).json
+
+inputFiles.lst
+Untitled spreadsheet (2).xlsx
+
+
+# Maven build output
+/target/
+
+# Eclipse / IntelliJ / VSCode specific files
+*.iml
+.idea/
+*.class
+*.log
+.vscode/
+*.DS_Store
+
+# OS generated files
+Thumbs.db
+.DS_Store
+
+# Environment or secret configuration
+*.env
+*.key
+*.pem
+
+# Excel and JSON input/output files
+*.xlsx
+*.json
+inputFiles.lst
+createdFiles.lst
+
+# Logs or runtime files
+*.log
+*.tmp
+*.bak
+
+# Java compiled class files
+*.class
+
+# Test result files
+/test-classes/
+
+# Local data or scratch files
+Untitled spreadsheet*.xlsx
+bulk*.xlsx
+proj-news*.json
