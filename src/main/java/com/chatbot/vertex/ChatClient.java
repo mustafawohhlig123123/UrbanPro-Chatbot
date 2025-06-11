@@ -36,14 +36,20 @@ public class ChatClient {
                         .build();
 
                 try (Response response = httpClient.newCall(request).execute()) {
+
                     if (!response.isSuccessful()) {
+
                         System.err.println("Server error: " + response.code());
+
                     } else {
+                        
                         System.out.println("Chatbot: " + response.body().string());
+
                     }
                 }
             }
         } catch (Exception e) {
+            
             System.err.println("An error occurred. Is the server running? Details: " + e.getMessage());
         }
     }

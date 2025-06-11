@@ -17,8 +17,10 @@ public class App {
             client.runConsoleSession();
 
         } catch (InterruptedException e) {
+
             System.err.println("Application was interrupted.");
             Thread.currentThread().interrupt(); 
+            
         } finally {
   
             server.stop();
