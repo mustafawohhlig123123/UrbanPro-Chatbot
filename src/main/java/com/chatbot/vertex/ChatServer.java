@@ -99,6 +99,7 @@ public class ChatServer {
 
     private String getChatbotResponse(String userPrompt) {
         try {
+            
             GoogleCredentials credentials = GoogleCredentials.getApplicationDefault()
                 .createScoped(Collections.singleton("https://www.googleapis.com/auth/cloud-platform"));
             credentials.refreshIfExpired();
@@ -199,7 +200,7 @@ public class ChatServer {
             for (int i = 0; i < responses.length(); i++) {
 
                 JSONObject responseObj = responses.getJSONObject(i);
-                
+
                 if (responseObj.has("candidates")) {
 
                     JSONArray candidates = responseObj.getJSONArray("candidates");
