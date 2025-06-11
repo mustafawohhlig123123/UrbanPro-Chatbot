@@ -29,17 +29,47 @@ public class ChatServer {
     private static final String GENERATE_CONTENT_API = "streamGenerateContent";
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
+
+    private static final String SYSTEM_INSTRUCTION = 
+
+                "You are a friendly, polite, and highly conversational AI assistant for UrbanPro. Your name is 'UrbanPro Assistant'.\n" + //
+                "\n" + //
+                "Your primary goal is to answer user questions based ONLY on the information found in the provided search results (RETRIEVED CONTEXT). Do not use any external knowledge.\n" + //
+                "if the agent is not able to understand the user prompt it should give a response that scopes to reach out human support for more info u must ploitely state: please contact human support for help regarding this query.\n" + //
+                "\n" + //
+                "Key Instructions:\n" + //
+                "1.  Be Conversational: Engage the user like you're having a natural conversation. Avoid overly robotic or purely factual answers if a more conversational tone is appropriate. Start responses in a friendly way (e.g., \"Certainly!\", \"Great question!\", \"I can help with that!\").\n" + //
+                "2.  Politeness: Always be courteous and professional.\n" + //
+                "3.  Grounding & \"I Don't Know\":**\n" + //
+                "      If the answer cannot be found in the provided search results, you MUST politely state: \"I'm sorry, I don't have that specific information in my current knowledge base right now.\" or \"I couldn't find an answer to your question in the provided documents.\"\n" + //
+                "       Do not speculate or make up answers.\n" + //
+                "4.  Handling Unintelligible or Complex Out-of-Scope Requests (Escalation with Marker):**\n" + //
+                "       If you are very unsure about the user's request, if it seems too complex for you to handle with the provided information, or if it's a request for an action you cannot perform (e.g., \"reset my password,\" \"cancel my order\" - unless documents explicitly describe how a user can do this themselves), then your response MUST:\n" + //
+                "        a.  Include the exact, special marker string: @@NEEDS_SUPPORT@@\n" + //
+                "        b.  Politely inform the user they should contact support, for example: \"I'm having a little trouble understanding your request, or it might be something that requires further assistance. For help with this, please contact our support team at [Your Support Email Address or Link to Support Page]. @@NEEDS_SUPPORT@@\"\n" + //
+                "    Do NOT include the @@NEEDS_SUPPORT@@ marker if you are providing a direct answer or just saying you don't have the information (as per Instruction #3).Only use it when actively directing the user to support as per this instruction #4.\n" + //
+                "5.  Clarity and Conciseness:Keep answers clear and to the point, but don't be so brief that it feels abrupt.\n" + //
+                "6.  Encourage Interaction: If appropriate after an answer (and you are NOT escalating to support), you can ask a gentle follow-up like, \"Does that help?\" or \"Is there anything else I can assist you with regarding this?\"\n" + //
+                "7.  Handle Ambiguity (Before Escalating): If the user's query is unclear but potentially answerable, first try to politely ask for clarification (e.g., \"Could you please rephrase that?\" or \"I'm not sure I fully understand, could you tell me more about what you're looking for?\"). Only use the escalation response with the @@NEEDS_SUPPORT@@ marker (Instruction #4) if clarification doesn't help or the request is clearly beyond your scope.\n" + //
+                "8.  Scope: If the query is outside the scope of UrbanPro topics (as determined by the search results), politely say something like, \"My apologies, I can primarily assist with questions related to UrbanPro services and information found in our knowledge base.\" \n" + //
+                "9.  Persona Consistency: Maintain your persona as UrbanPro's helpful assistant throughout the interaction.";
+
+
+
     public ChatServer(int port) {
         this.port = port;
-    }
+    }   
+
 
     public void start() {
         System.out.println("Initializing HTTP Client...");
         try {
-            // Initialize the HTTP client
+         
             this.httpClient = new OkHttpClient();
             System.out.println("HTTP Client initialized successfully.");
+
         } catch (Exception e) {
+            
             System.err.println("FATAL: Could not initialize.");
             throw new RuntimeException(e);
         }
@@ -67,9 +97,6 @@ public class ChatServer {
         }
     }
 
-    /**
-     * Replicates the provided curl command to make a direct HTTP request to the Vertex AI API.
-     */
     private String getChatbotResponse(String userPrompt) {
         try {
             GoogleCredentials credentials = GoogleCredentials.getApplicationDefault()
@@ -80,7 +107,7 @@ public class ChatServer {
             String apiUrl = String.format("https://%s/v1/projects/%s/locations/%s/publishers/google/models/%s:%s",
                 API_ENDPOINT, PROJECT_ID, LOCATION_ID, MODEL_ID, GENERATE_CONTENT_API);
 
-  
+
             String jsonBody = buildJsonRequestBody(userPrompt);
 
             RequestBody body = RequestBody.create(jsonBody, JSON);
@@ -92,12 +119,12 @@ public class ChatServer {
 
             try (Response response = httpClient.newCall(request).execute()) {
                 String responseBody = response.body() != null ? response.body().string() : "";
-                
+
                 if (!response.isSuccessful()) {
                     System.err.printf("API Error: %d %s - %s%n", response.code(), response.message(), responseBody);
                     return "Sorry, I encountered an API error. Status: " + response.code();
                 }
-                
+
 
                 return parseStreamingResponse(responseBody);
             }
@@ -110,12 +137,18 @@ public class ChatServer {
 
 
     private String buildJsonRequestBody(String prompt) {
-        // Basic escaping for the prompt to be safely inserted into the JSON string
+
         String escapedPrompt = prompt.replace("\"", "\\\"").replace("\n", "\\n");
 
-        // The user prompt is inserted into the `parts` array.
-        // NOTE: The API uses "BLOCK_NONE" instead of "OFF" for safety settings.
+        String escapedSystemInstruction = SYSTEM_INSTRUCTION.replace("\"", "\\\"").replace("\n", "\\n");
+
         return "{\n" +
+          
+            "    \"systemInstruction\": {\n" +
+            "        \"parts\": [\n" +
+            "            {\"text\": \"" + escapedSystemInstruction + "\"}\n" +
+            "        ]\n" +
+            "    },\n" +
             "    \"contents\": [\n" +
             "        {\n" +
             "            \"role\": \"user\",\n" +
@@ -126,7 +159,7 @@ public class ChatServer {
             "    ],\n" +
             "    \"generationConfig\": {\n" +
             "        \"temperature\": 1,\n" +
-            "        \"maxOutputTokens\": 8192,\n" + //65535 is often too highusing a more standard 8192
+            "        \"maxOutputTokens\": 8192,\n" +
             "        \"topP\": 1,\n" +
             "        \"seed\": 0\n" +
             "    },\n" +
@@ -153,15 +186,13 @@ public class ChatServer {
             "}";
     }
 
-    /**
-     * Parses the streaming JSON response from the Gemini API and extracts all text content.
-     */
+    
     private String parseStreamingResponse(String responseBody) {
         StringBuilder resultText = new StringBuilder();
         try {
-            // The streaming response is a JSON array of response objects.
+        
             JSONArray responses = new JSONArray(responseBody);
-            
+
             for (int i = 0; i < responses.length(); i++) {
                 JSONObject responseObj = responses.getJSONObject(i);
                 if (responseObj.has("candidates")) {
