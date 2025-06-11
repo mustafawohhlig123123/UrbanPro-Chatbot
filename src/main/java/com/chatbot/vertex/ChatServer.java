@@ -20,9 +20,6 @@ public class ChatServer {
         this.port = port;
     }
 
-    /**
-     * Initializes the Vertex AI model and starts the Javalin server on a background thread.
-     */
     public void start() {
         System.out.println("Initializing Vertex AI model...");
         try {
@@ -41,7 +38,7 @@ public class ChatServer {
                 ctx.result(botResponse).contentType("text/plain");
             });
 
-        // Use a daemon thread so the app can exit even if the server is running
+
         Thread serverThread = new Thread(() -> app.start(port));
         serverThread.setDaemon(true); 
         serverThread.start();
@@ -49,9 +46,6 @@ public class ChatServer {
         System.out.println("Chat server has been started in the background on port " + port);
     }
 
-    /**
-     * Stops the running Javalin server.
-     */
     public void stop() {
         if (app != null) {
             app.stop();

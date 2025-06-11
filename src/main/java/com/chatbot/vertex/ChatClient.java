@@ -1,28 +1,23 @@
 package com.chatbot.vertex;
 
+import okhttp3.*;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 
 public class ChatClient {
 
     private final String serverUrl;
-    private final HttpClient httpClient;
+    private final OkHttpClient httpClient;
+    private final MediaType TEXT_PLAIN = MediaType.parse("text/plain; charset=utf-8");
 
     public ChatClient(String serverUrl) {
         this.serverUrl = serverUrl;
-        this.httpClient = HttpClient.newHttpClient();
+        this.httpClient = new OkHttpClient();
     }
 
-    /**
-     * Starts the interactive command-line session to chat with the server.
-     */
     public void runConsoleSession() {
         System.out.println("Chat client started. Type 'exit' to quit.");
-       
 
         try (BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in))) {
             String userInput;
@@ -34,13 +29,19 @@ public class ChatClient {
                     break;
                 }
 
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(serverUrl))
-                        .POST(HttpRequest.BodyPublishers.ofString(userInput))
+                RequestBody body = RequestBody.create(userInput, TEXT_PLAIN);
+                Request request = new Request.Builder()
+                        .url(serverUrl)
+                        .post(body)
                         .build();
 
-                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-                System.out.println("Chatbot: " + response.body());
+                try (Response response = httpClient.newCall(request).execute()) {
+                    if (!response.isSuccessful()) {
+                        System.err.println("Server error: " + response.code());
+                    } else {
+                        System.out.println("Chatbot: " + response.body().string());
+                    }
+                }
             }
         } catch (Exception e) {
             System.err.println("An error occurred. Is the server running? Details: " + e.getMessage());
