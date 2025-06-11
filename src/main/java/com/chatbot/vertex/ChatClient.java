@@ -16,9 +16,6 @@ public class ChatClient {
         this.httpClient = new OkHttpClient();
     }
 
-    /**
-     * Starts the interactive command-line session to chat with the server.
-     */
     public void runConsoleSession() {
         System.out.println("Chat client started. Type 'exit' to quit.");
 
