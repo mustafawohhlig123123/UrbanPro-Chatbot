@@ -111,6 +111,7 @@ public class ChatServer {
             String jsonBody = buildJsonRequestBody(userPrompt);
 
             RequestBody body = RequestBody.create(jsonBody, JSON);
+
             Request request = new Request.Builder()
                 .url(apiUrl)
                 .header("Authorization", "Bearer " + accessToken)
@@ -129,9 +130,11 @@ public class ChatServer {
                 return parseStreamingResponse(responseBody);
             }
         } catch (IOException e) {
+
             System.err.println("Error during HTTP request to Vertex AI: " + e.getMessage());
             e.printStackTrace();
             return "Sorry, a network error occurred while processing your request.";
+
         }
     }
 
@@ -194,22 +197,28 @@ public class ChatServer {
             JSONArray responses = new JSONArray(responseBody);
 
             for (int i = 0; i < responses.length(); i++) {
+
                 JSONObject responseObj = responses.getJSONObject(i);
+                
                 if (responseObj.has("candidates")) {
+
                     JSONArray candidates = responseObj.getJSONArray("candidates");
                     JSONObject firstCandidate = candidates.getJSONObject(0);
                     JSONObject content = firstCandidate.getJSONObject("content");
                     JSONArray parts = content.getJSONArray("parts");
                     JSONObject firstPart = parts.getJSONObject(0);
+
                     if (firstPart.has("text")) {
                          resultText.append(firstPart.getString("text"));
                     }
                 }
             }
         } catch (Exception e) {
+
             System.err.println("Failed to parse streaming response: " + e.getMessage());
             System.err.println("Response Body was: " + responseBody);
             return "Error: Could not parse the AI's response.";
+
         }
         return resultText.toString();
     }
