@@ -40,6 +40,18 @@
     <artifactId>google-cloud-bigquery</artifactId>
     <version>2.32.0</version>
 </dependency>
+ <dependency>
+    <groupId>org.apache.pdfbox</groupId>
+    <artifactId>pdfbox</artifactId>
+    <version>2.0.30</version>
+  </dependency>
+
+  <!-- Optional: Use flexmark if you want to format into Markdown syntax -->
+  <dependency>
+    <groupId>com.vladsch.flexmark</groupId>
+    <artifactId>flexmark</artifactId>
+    <version>0.64.0</version>
+  </dependency>
 
      <dependency>
             <groupId>com.google.cloud</groupId>
