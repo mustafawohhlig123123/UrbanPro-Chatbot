@@ -13,7 +13,7 @@ public class ChatClient {
     
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     
-   
+    //hardcoded user ID for now as it is required to be sent to the server route in the params
     private static final String USER_ID = "user-002";
 
     public ChatClient(String serverUrl) {
