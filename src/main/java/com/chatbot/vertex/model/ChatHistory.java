@@ -3,7 +3,7 @@ package com.chatbot.vertex.model;
 import org.bson.codecs.pojo.annotations.BsonId;
 
 import java.util.ArrayList;
-import java.util.Arrays; // <-- ADDED THIS IMPORT
+import java.util.Arrays;
 import java.util.List;
 
 public class ChatHistory {
@@ -28,9 +28,9 @@ public class ChatHistory {
 
     public void addMessage(String role, String text) {
         Part part = new Part(text);
-        //                             vvvvvvvvvvvvvvvv
-        Content content = new Content(role, Arrays.asList(part)); // <-- THIS IS THE FIX
-        //                             ^^^^^^^^^^^^^^^^^^
+    
+        Content content = new Content(role, Arrays.asList(part));
+                                   
         this.history.add(content);
     }
 }
